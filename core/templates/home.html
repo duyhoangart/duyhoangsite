@@ -129,21 +129,10 @@
                 <ul class="pagination justify-content-center">
                     {% if samples.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page=1" aria-label="First">
-                            <span aria-hidden="true">&laquo;&laquo;</span>
-                        </a>
+                        <a class="page-link" href="?page=1">«« Đầu</a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ samples.previous_page_number }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link">&laquo;&laquo;</span>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link">&laquo;</span>
+                        <a class="page-link" href="?page={{ samples.previous_page_number }}">« Trước</a>
                     </li>
                     {% endif %}
 
@@ -161,21 +150,10 @@
 
                     {% if samples.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ samples.next_page_number }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
+                        <a class="page-link" href="?page={{ samples.next_page_number }}">Sau »</a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ samples.paginator.num_pages }}" aria-label="Last">
-                            <span aria-hidden="true">&raquo;&raquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link">&raquo;</span>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link">&raquo;&raquo;</span>
+                        <a class="page-link" href="?page={{ samples.paginator.num_pages }}">Cuối »»</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -203,7 +181,7 @@
 </div>
 
 <script>
-// Filter function with pagination support
+// Filter function
 document.addEventListener('DOMContentLoaded', function() {
     const filterButtons = document.querySelectorAll('.filter-btn');
     const sampleItems = document.querySelectorAll('.sample-item');
@@ -212,14 +190,11 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const filter = this.getAttribute('data-filter');
             
-            // Update active button
             filterButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             
-            // Count visible items
             let visibleCount = 0;
             
-            // Filter items
             sampleItems.forEach(item => {
                 if (filter === 'all') {
                     item.style.display = 'block';
@@ -232,7 +207,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
-            // Show message if no items found
             const gallery = document.getElementById('sampleGallery');
             let noResultMsg = gallery.querySelector('.no-results');
             
