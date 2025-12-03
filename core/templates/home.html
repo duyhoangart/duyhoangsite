@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Trang chủ - Duy Hoàng Art{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold mb-3">Chào mừng đến với Duy Hoàng</h1>
+            <p class="lead text-muted">Ở đây bán commission với chất lượng số 1 VN (uh chac v)</p>
+            {% if not user.is_authenticated %}
+                <div class="mt-4">
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="bi bi-person-plus"></i> Đăng ký ngay
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
+                    </a>
+                </div>
+            {% else %}
+                <div class="mt-4">
+                    <a href="{% url 'create_order' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle"></i> Đặt đơn ngay skibidi
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Services Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Bảng giá dịch vụ</h2>
+        </div>
+        {% for service in services %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-title">{{ service.name }}</h3>
+                    <p class="card-text text-muted">{{ service.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="text-primary mb-0">{{ service.price|floatformat:0 }}đ</h4>
+                        {% if user.is_authenticated and user.user_type == 'customer' %}
+                        <a href="{% url 'create_order' %}" class="btn btn-primary">
+                            Đặt đơn
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center text-muted">Chưa có dịch vụ nào.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Samples Gallery with Filter -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="fw-bold mb-2">
+                <i class="bi bi-palette-fill text-primary"></i> Samples
+            </h2>
+            <p class="text-muted">Các mẫu tranh đã hoàn thành</p>
+        </div>
+        
+        <div class="col-12">
+            <!-- Filter Buttons -->
+            {% if services %}
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="bi bi-grid-3x3-gap-fill"></i> Tất cả
+                </button>
+                {% for service in services %}
+                <button class="filter-btn" data-filter="service-{{ service.id }}">
+                    {{ service.name }}
+                </button>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Samples Grid -->
+            <div class="sample-gallery" id="sampleGallery">
+                {% for sample in samples %}
+                <div class="sample-item service-{{ sample.service_type.id }}" 
+                     data-bs-toggle="modal" 
+                     data-bs-target="#sampleModal{{ sample.id }}">
+                    <img src="{{ sample.image.url }}" alt="{{ sample.title }}">
+                    <div class="sample-info">
+                        <div class="sample-title">{{ sample.title }}</div>
+                        <div class="sample-type">{{ sample.service_type.name }}</div>
+                        <div class="sample-order">Thứ tự: {{ sample.display_order }}</div>
+                    </div>
+                </div>
+                
+                <!-- Modal for each sample -->
+                <div class="modal fade" id="sampleModal{{ sample.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title fw-bold">{{ sample.title }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body text-center p-4">
+                                <img src="{{ sample.image.url }}" class="img-fluid mb-3" style="max-height: 70vh; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                                <span class="badge bg-primary mb-2">{{ sample.service_type.name }}</span>
+                                {% if sample.description %}
+                                <p class="text-muted mt-2">{{ sample.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="bi bi-images display-1 text-muted"></i>
+                        <p class="text-muted mt-3">Chưa có sample nào.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- TOS Preview -->
+    {% if tos %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Điều khoản dịch vụ</h3>
+                    <p class="card-text">{{ tos.content|truncatewords:50 }}</p>
+                    <a href="{% url 'tos' %}" class="btn btn-outline-primary">
+                        Xem đầy đủ điều khoản
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Simple filter function - NO complex JS
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const sampleItems = document.querySelectorAll('.sample-item');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+            
+            // Update active button
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter items
+            sampleItems.forEach(item => {
+                if (filter === 'all') {
+                    item.style.display = 'block';
+                } else if (item.classList.contains(filter)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

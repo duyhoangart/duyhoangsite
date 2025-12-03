@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Quản lý thanh toán{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4"><i class="bi bi-credit-card"></i> Quản lý thanh toán</h1>
+    
+    <!-- Pending Payments -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning">
+            <h4 class="mb-0">Thanh toán chờ xác thực ({{ payments.count }})</h4>
+        </div>
+        <div class="card-body">
+            {% if payments %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>Số tiền</th>
+                            <th>Mã GD</th>
+                            <th>Ngày upload</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td><strong>{{ payment.order.order_id }}</strong></td>
+                            <td>{{ payment.order.customer.username }}</td>
+                            <td>{{ payment.amount|floatformat:0 }}đ</td>
+                            <td>{{ payment.transaction_id|default:"-" }}</td>
+                            <td>{{ payment.created_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'verify_payment' payment.id %}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-circle"></i> Xác thực
+                                </a>
+                                <a href="{% url 'artist_order_detail' payment.order.id %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye"></i> Xem đơn
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted py-4">Không có thanh toán nào chờ xác thực.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Verified Payments -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">Đã xác thực gần đây</h4>
+        </div>
+        <div class="card-body">
+            {% if verified_payments %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>Số tiền</th>
+                            <th>Ngày xác thực</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in verified_payments %}
+                        <tr>
+                            <td><strong>{{ payment.order.order_id }}</strong></td>
+                            <td>{{ payment.order.customer.username }}</td>
+                            <td>{{ payment.amount|floatformat:0 }}đ</td>
+                            <td>{{ payment.verified_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted py-4">Chưa có thanh toán nào được xác thực.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

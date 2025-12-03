@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Điều khoản dịch vụ - Duy Hoàng Art{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <i class="bi bi-file-text"></i> Điều khoản dịch vụ (Terms of Service)
+                    </h2>
+                </div>
+                <div class="card-body p-5">
+                    {% if tos %}
+                        <div class="mb-3">
+                            <span class="badge bg-secondary">{{ tos.version }}</span>
+                            <span class="text-muted small ms-2">
+                                Cập nhật: {{ tos.created_at|date:"d/m/Y" }}
+                            </span>
+                        </div>
+                        
+                        <div class="tos-content" style="line-height: 1.8;">
+                            {{ tos.content|linebreaks }}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-exclamation-triangle display-1 text-warning"></i>
+                            <p class="text-muted mt-3">Chưa có điều khoản dịch vụ nào được công bố.</p>
+                        </div>
+                    {% endif %}
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <a href="{% url 'home' %}" class="btn btn-primary">
+                            <i class="bi bi-arrow-left"></i> Quay lại trang chủ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

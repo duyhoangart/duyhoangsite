@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload chứng từ thanh toán - {{ order.order_id }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-credit-card"></i> Upload chứng từ thanh toán
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Payment Info -->
+                    <div class="payment-info mb-4">
+                        <h4 class="mb-3">
+                            <i class="bi bi-bank"></i> Thông tin chuyển khoản
+                        </h4>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Mã đơn hàng</div>
+                            <div class="info-value">{{ order.order_id }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Ngân hàng</div>
+                            <div class="info-value">Vietcombank</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Số tài khoản</div>
+                            <div class="info-value">1234567890</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Chủ tài khoản</div>
+                            <div class="info-value">NGUYEN DUY HOANG</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Số tiền cần chuyển</div>
+                            <div class="info-value">{{ order.price|floatformat:0 }}đ</div>
+                        </div>
+                        
+                        <div class="info-item" style="background: rgba(255, 255, 255, 0.2);">
+                            <div class="info-label">
+                                <i class="bi bi-exclamation-triangle"></i> 
+                                Nội dung chuyển khoản (BẮT BUỘC)
+                            </div>
+                            <div class="info-value" style="font-size: 1.5rem;">
+                                {{ order.get_short_order_id }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="alert alert-warning mb-4">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-info-circle"></i> Hướng dẫn
+                        </h5>
+                        <ol class="mb-0">
+                            <li>Chuyển khoản với nội dung: <strong>{{ order.get_short_order_id }}</strong></li>
+                            <li>Chụp ảnh màn hình giao dịch thành công</li>
+                            <li>Upload ảnh chứng từ ở form bên dưới</li>
+                            <li>Nhập mã giao dịch (nếu có)</li>
+                            <li>Artist sẽ xác thực thanh toán của bạn</li>
+                        </ol>
+                    </div>
+
+                    <!-- Upload Form -->
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.amount.id_for_label }}" class="form-label">
+                                <strong>{{ form.amount.label }} *</strong>
+                            </label>
+                            {{ form.amount }}
+                            <small class="form-text text-muted">
+                                Số tiền bạn đã chuyển khoản (có thể nhiều hơn nếu muốn tip)
+                            </small>
+                            {% if form.amount.errors %}
+                            <div class="text-danger small">{{ form.amount.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.transaction_id.id_for_label }}" class="form-label">
+                                <strong>{{ form.transaction_id.label }}</strong>
+                            </label>
+                            {{ form.transaction_id }}
+                            <small class="form-text text-muted">
+                                Mã giao dịch từ ngân hàng (nếu có)
+                            </small>
+                            {% if form.transaction_id.errors %}
+                            <div class="text-danger small">{{ form.transaction_id.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.proof_image.id_for_label }}" class="form-label">
+                                <strong>{{ form.proof_image.label }} *</strong>
+                            </label>
+                            {{ form.proof_image }}
+                            <small class="form-text text-muted">
+                                Ảnh chụp màn hình giao dịch thành công
+                            </small>
+                            {% if form.proof_image.errors %}
+                            <div class="text-danger small">{{ form.proof_image.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Preview Area -->
+                        <div id="imagePreview" class="mb-4" style="display: none;">
+                            <p class="fw-bold">Preview ảnh chứng từ:</p>
+                            <img id="preview" src="#" alt="Preview" class="img-fluid border" style="max-height: 400px;">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle"></i> Xác nhận upload
+                            </button>
+                            <a href="{% url 'order_detail' order.id %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Preview image before upload
+document.getElementById('id_proof_image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview').src = e.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+{% endblock %}

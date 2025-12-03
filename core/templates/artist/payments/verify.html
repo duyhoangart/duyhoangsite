@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Xác thực thanh toán{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h3>Xác thực thanh toán</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Thông tin đơn hàng</h5>
+                            <p><strong>Mã đơn:</strong> {{ payment.order.order_id }}</p>
+                            <p><strong>Mã chuyển khoản:</strong> <span class="badge bg-primary">{{ payment.order.get_short_order_id }}</span></p>
+                            <p><strong>Khách hàng:</strong> {{ payment.order.customer.username }}</p>
+                            <p><strong>Giá đơn hàng:</strong> {{ payment.order.price|floatformat:0 }}đ</p>
+                            <p><strong>Số tiền đã chuyển:</strong> <strong class="text-success">{{ payment.amount|floatformat:0 }}đ</strong></p>
+                            {% if payment.transaction_id %}
+                            <p><strong>Mã giao dịch:</strong> {{ payment.transaction_id }}</p>
+                            {% endif %}
+                            <p><strong>Ngày upload:</strong> {{ payment.created_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Chứng từ thanh toán</h5>
+                            {% if payment.proof_image %}
+                            <img src="{{ payment.proof_image.url }}" alt="Payment Proof" class="img-fluid border">
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                <strong>{{ field.label }}</strong>
+                            </label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="verify" value="true" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle"></i> Xác thực thanh toán
+                            </button>
+                            <button type="submit" name="reject" value="true" class="btn btn-danger">
+                                <i class="bi bi-x-circle"></i> Từ chối thanh toán
+                            </button>
+                            <a href="{% url 'artist_payments' %}" class="btn btn-secondary">Hủy</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

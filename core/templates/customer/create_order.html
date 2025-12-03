@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Đặt hàng mới - Duy Hoàng Art{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-plus-circle"></i> Tạo đơn hàng mới
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Bảng giá -->
+                    <div class="alert alert-info mb-4">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-info-circle"></i> Bảng giá dịch vụ
+                        </h5>
+                        <hr>
+                        {% for service in services %}
+                        <div class="mb-2">
+                            <strong>{{ service.name }}:</strong> 
+                            <span class="text-primary">{{ service.price|floatformat:0 }}đ</span>
+                            <br>
+                            <small class="text-muted">{{ service.description }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Form đặt hàng -->
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.service_type.id_for_label }}" class="form-label">
+                                <strong>{{ form.service_type.label }} *</strong>
+                            </label>
+                            {{ form.service_type }}
+                            {% if form.service_type.errors %}
+                            <div class="text-danger small">{{ form.service_type.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                <strong>{{ form.description.label }} *</strong>
+                            </label>
+                            {{ form.description }}
+                            <small class="form-text text-muted">
+                                Vui lòng mô tả chi tiết yêu cầu của bạn: tư thế, biểu cảm, trang phục, màu sắc, v.v.
+                            </small>
+                            {% if form.description.errors %}
+                            <div class="text-danger small">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.brief_file.id_for_label }}" class="form-label">
+                                <strong>{{ form.brief_file.label }}</strong>
+                            </label>
+                            {{ form.brief_file }}
+                            <small class="form-text text-muted">
+                                Bạn có thể upload file reference/brief (ảnh, PDF, v.v.)
+                            </small>
+                            {% if form.brief_file.errors %}
+                            <div class="text-danger small">{{ form.brief_file.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- TOS Agreement -->
+                        {% if tos %}
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title">Điều khoản dịch vụ</h6>
+                                <div style="max-height: 200px; overflow-y: auto;">
+                                    <small>{{ tos.content|linebreaks }}</small>
+                                </div>
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input" type="checkbox" id="acceptTos" required>
+                                    <label class="form-check-label" for="acceptTos">
+                                        Tôi đã đọc và đồng ý với 
+                                        <a href="{% url 'tos' %}" target="_blank">điều khoản dịch vụ</a>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Gửi đơn hàng
+                            </button>
+                            <a href="{% url 'customer_dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

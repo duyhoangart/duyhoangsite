@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+
+{% block title %}Chi tiết đơn hàng {{ order.order_id }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>Đơn hàng {{ order.order_id }}</h2>
+                    <span class="status-badge status-{{ order.status }}">
+                        {{ order.get_status_display }}
+                    </span>
+                </div>
+                <a href="{% url 'artist_orders' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- LEFT COLUMN: Thông tin đơn hàng + Tiến độ -->
+        <div class="col-lg-8 mb-4">
+            <!-- Order Info -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Thông tin đơn hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Khách hàng:</strong></div>
+                        <div class="col-sm-8">{{ order.customer.username }} ({{ order.customer.email }})</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Dịch vụ:</strong></div>
+                        <div class="col-sm-8">{{ order.service_type.name }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Giá:</strong></div>
+                        <div class="col-sm-8">
+                            <strong class="text-primary">{{ order.price|floatformat:0 }}đ</strong>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Ngày tạo:</strong></div>
+                        <div class="col-sm-8">{{ order.created_at|date:"d/m/Y H:i" }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Mô tả:</strong></div>
+                        <div class="col-sm-8">{{ order.description|linebreaks }}</div>
+                    </div>
+                    {% if order.brief_file %}
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>File brief:</strong></div>
+                        <div class="col-sm-8">
+                            <a href="{{ order.brief_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-download"></i> Tải xuống
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if order.admin_note %}
+                    <div class="row">
+                        <div class="col-sm-4"><strong>Ghi chú của bạn:</strong></div>
+                        <div class="col-sm-8">
+                            <div class="alert alert-info mb-0">{{ order.admin_note|linebreaks }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Payment Info -->
+            {% if order.payment %}
+            <div class="card mb-4">
+                <div class="card-header {% if order.payment.status == 'pending' %}bg-warning{% else %}bg-success text-white{% endif %}">
+                    <h5 class="mb-0">Thông tin thanh toán</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Số tiền:</strong> {{ order.payment.amount|floatformat:0 }}đ</p>
+                            {% if order.payment.transaction_id %}
+                            <p><strong>Mã giao dịch:</strong> {{ order.payment.transaction_id }}</p>
+                            {% endif %}
+                            <p><strong>Ngày upload:</strong> {{ order.payment.created_at|date:"d/m/Y H:i" }}</p>
+                            <p><strong>Trạng thái:</strong> 
+                                <span class="status-badge status-{{ order.payment.status }}">
+                                    {{ order.payment.get_status_display }}
+                                </span>
+                            </p>
+                            {% if order.payment.admin_note %}
+                            <div class="alert alert-info">
+                                <strong>Ghi chú:</strong> {{ order.payment.admin_note }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {% if order.payment.proof_image %}
+                            <p><strong>Chứng từ:</strong></p>
+                            <img src="{{ order.payment.proof_image.url }}" alt="Payment Proof" class="img-fluid border rounded" style="max-height: 300px;">
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if order.payment.status == 'pending' %}
+                    <div class="mt-3">
+                        <a href="{% url 'verify_payment' order.payment.id %}" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Xác thực thanh toán
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Progress Updates -->
+            {% if progress_updates %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-image"></i> Tiến độ đã upload
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for progress in progress_updates %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <img src="{{ progress.image.url }}" alt="Progress" class="card-img-top" style="height: 250px; object-fit: cover;">
+                                <div class="card-body">
+                                    <p class="small text-muted mb-1">
+                                        <i class="bi bi-clock"></i> {{ progress.created_at|date:"d/m/Y H:i" }}
+                                    </p>
+                                    {% if progress.note %}
+                                    <p class="mb-0">{{ progress.note }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- RIGHT COLUMN: Thao tác + Timeline + Tin nhắn -->
+        <div class="col-lg-4">
+            <!-- Action Buttons -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Thao tác</h5>
+                </div>
+                <div class="card-body">
+                    {% if order.status == 'pending' %}
+                    <a href="{% url 'approve_order' order.id %}" class="btn btn-success w-100 mb-2">
+                        <i class="bi bi-check-circle"></i> Duyệt đơn hàng
+                    </a>
+                    {% endif %}
+                    
+                    {% if order.status in 'paid,in_progress' %}
+                    <a href="{% url 'update_order_status' order.id %}" class="btn btn-primary w-100 mb-2">
+                        <i class="bi bi-arrow-repeat"></i> Cập nhật trạng thái
+                    </a>
+                    <a href="{% url 'add_progress' order.id %}" class="btn btn-info w-100 mb-2">
+                        <i class="bi bi-plus-circle"></i> Thêm tiến độ
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i> Timeline
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Đơn hàng được tạo</strong>
+                            <br>
+                            <small class="text-muted">{{ order.created_at|date:"d/m/Y H:i" }}</small>
+                        </li>
+                        {% if order.approved_at %}
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Đã duyệt</strong>
+                            <br>
+                            <small class="text-muted">{{ order.approved_at|date:"d/m/Y H:i" }}</small>
+                        </li>
+                        {% endif %}
+                        {% if order.payment and order.payment.verified_at %}
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Đã xác thực thanh toán</strong>
+                            <br>
+                            <small class="text-muted">{{ order.payment.verified_at|date:"d/m/Y H:i" }}</small>
+                        </li>
+                        {% endif %}
+                        {% if order.completed_at %}
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Hoàn thành</strong>
+                            <br>
+                            <small class="text-muted">{{ order.completed_at|date:"d/m/Y H:i" }}</small>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-chat-dots"></i> Tin nhắn
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="message-box" style="max-height: 400px;">
+                        {% for msg in messages_list %}
+                        <div class="message-item {% if msg.sender.user_type == 'artist' %}message-from-artist{% else %}message-from-customer{% endif %}">
+                            <div class="message-sender">
+                                {% if msg.sender.user_type == 'artist' %}
+                                    <i class="bi bi-palette"></i> Bạn
+                                {% else %}
+                                    <i class="bi bi-person"></i> {{ msg.sender.username }}
+                                {% endif %}
+                            </div>
+                            <div class="message-content">{{ msg.content|linebreaks }}</div>
+                            {% if msg.image %}
+                            <div class="mt-2">
+                                <img src="{{ msg.image.url }}" alt="Attachment" style="max-width: 100%;" class="img-thumbnail">
+                            </div>
+                            {% endif %}
+                            <div class="message-time">{{ msg.created_at|date:"d/m/Y H:i" }}</div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center p-3">Chưa có tin nhắn nào.</p>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Send Message Form -->
+                    <div class="p-3 border-top">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="send_message" value="1">
+                            <div class="mb-2">
+                                <textarea name="content" class="form-control form-control-sm" rows="2" placeholder="Nhập tin nhắn..."></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <input type="file" name="image" class="form-control form-control-sm" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-send"></i> Gửi tin nhắn
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

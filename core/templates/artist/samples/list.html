@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Quản lý samples{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1><i class="bi bi-images"></i> Quản lý Samples</h1>
+                <a href="{% url 'add_sample' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Thêm sample mới
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for sample in samples %}
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card">
+                <img src="{{ sample.image.url }}" class="card-img-top" alt="{{ sample.title }}" style="height: 250px; object-fit: cover;">
+                <div class="card-body">
+                    <h6 class="card-title">{{ sample.title }}</h6>
+                    <p class="card-text small text-muted">{{ sample.service_type.name }}</p>
+                    <p class="card-text small">Thứ tự: {{ sample.display_order }}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                Chưa có sample nào. <a href="{% url 'add_sample' %}">Thêm sample đầu tiên</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

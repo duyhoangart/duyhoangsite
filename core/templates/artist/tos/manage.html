@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Quản lý TOS{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4"><i class="bi bi-file-text"></i> Quản lý điều khoản dịch vụ (TOS)</h1>
+    
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Tạo TOS mới</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                <strong>{{ field.label }}</strong>
+                            </label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Lưu TOS mới
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Lịch sử TOS</h4>
+                </div>
+                <div class="card-body">
+                    {% for tos in tos_list %}
+                    <div class="mb-3 p-3 border rounded {% if tos.is_active %}bg-success bg-opacity-10{% endif %}">
+                        <h6>{{ tos.version }}</h6>
+                        <small class="text-muted">{{ tos.created_at|date:"d/m/Y H:i" }}</small>
+                        {% if tos.is_active %}
+                        <br><span class="badge bg-success">Đang sử dụng</span>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">Chưa có TOS nào.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
