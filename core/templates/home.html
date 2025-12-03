@@ -58,7 +58,7 @@
         {% endfor %}
     </div>
 
-    <!-- Samples Gallery with Filter -->
+    <!-- Samples Gallery with Filter & Pagination -->
     <div class="row mb-5">
         <div class="col-12 text-center mb-4">
             <h2 class="fw-bold mb-2">
@@ -92,7 +92,6 @@
                     <div class="sample-info">
                         <div class="sample-title">{{ sample.title }}</div>
                         <div class="sample-type">{{ sample.service_type.name }}</div>
-                        <div class="sample-order">Thứ tự: {{ sample.display_order }}</div>
                     </div>
                 </div>
                 
@@ -123,6 +122,65 @@
                 </div>
                 {% endfor %}
             </div>
+
+            <!-- Pagination -->
+            {% if samples.has_other_pages %}
+            <nav aria-label="Sample pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if samples.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ samples.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;&laquo;</span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;</span>
+                    </li>
+                    {% endif %}
+
+                    {% for num in samples.paginator.page_range %}
+                        {% if samples.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > samples.number|add:'-3' and num < samples.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if samples.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ samples.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ samples.paginator.num_pages }}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;</span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;&raquo;</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
         </div>
     </div>
 
@@ -145,7 +203,7 @@
 </div>
 
 <script>
-// Simple filter function - NO complex JS
+// Filter function with pagination support
 document.addEventListener('DOMContentLoaded', function() {
     const filterButtons = document.querySelectorAll('.filter-btn');
     const sampleItems = document.querySelectorAll('.sample-item');
@@ -158,16 +216,39 @@ document.addEventListener('DOMContentLoaded', function() {
             filterButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             
+            // Count visible items
+            let visibleCount = 0;
+            
             // Filter items
             sampleItems.forEach(item => {
                 if (filter === 'all') {
                     item.style.display = 'block';
+                    visibleCount++;
                 } else if (item.classList.contains(filter)) {
                     item.style.display = 'block';
+                    visibleCount++;
                 } else {
                     item.style.display = 'none';
                 }
             });
+            
+            // Show message if no items found
+            const gallery = document.getElementById('sampleGallery');
+            let noResultMsg = gallery.querySelector('.no-results');
+            
+            if (visibleCount === 0) {
+                if (!noResultMsg) {
+                    noResultMsg = document.createElement('div');
+                    noResultMsg.className = 'no-results col-12 text-center py-5';
+                    noResultMsg.innerHTML = '<i class="bi bi-search display-1 text-muted"></i><p class="text-muted mt-3">Không có sample nào cho loại dịch vụ này.</p>';
+                    gallery.appendChild(noResultMsg);
+                }
+                noResultMsg.style.display = 'block';
+            } else {
+                if (noResultMsg) {
+                    noResultMsg.style.display = 'none';
+                }
+            }
         });
     });
 });

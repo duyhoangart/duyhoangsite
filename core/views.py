@@ -6,6 +6,7 @@ from django.db.models import Q, Count  # ← QUAN TRỌNG!
 from django.utils import timezone
 from .models import *
 from .forms import *
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # ============= HELPER FUNCTIONS =============
 def is_artist(user):
@@ -18,12 +19,28 @@ def is_customer(user):
 def home(request):
     """Trang chủ - hiển thị samples và giá"""
     services = ServiceType.objects.filter(is_active=True)
-    samples = Sample.objects.select_related('service_type').all()[:12]
+    
+    # Lấy tất cả samples và sắp xếp theo display_order
+    samples_list = Sample.objects.select_related('service_type').order_by('display_order', '-id')
+    
+    # Pagination: 12 samples per page
+    paginator = Paginator(samples_list, 12)
+    page = request.GET.get('page')
+    
+    try:
+        samples = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page
+        samples = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page
+        samples = paginator.page(paginator.num_pages)
+    
     tos = TermsOfService.objects.filter(is_active=True).first()
     
     context = {
         'services': services,
-        'samples': samples,
+        'samples': samples,  # Đây giờ là paginated object
         'tos': tos,
     }
     return render(request, 'home.html', context)
