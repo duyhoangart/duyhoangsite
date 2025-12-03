@@ -68,16 +68,16 @@
         </div>
         
         <div class="col-12">
-            <!-- Filter Buttons -->
+            <!-- Filter Buttons - Giờ dùng link thay vì button -->
             {% if services %}
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">
+            <div class="filter-buttons mb-4">
+                <a href="?" class="filter-btn {% if not selected_service %}active{% endif %}">
                     <i class="bi bi-grid-3x3-gap-fill"></i> Tất cả
-                </button>
+                </a>
                 {% for service in services %}
-                <button class="filter-btn" data-filter="service-{{ service.id }}">
+                <a href="?service={{ service.id }}" class="filter-btn {% if selected_service == service.id %}active{% endif %}">
                     {{ service.name }}
-                </button>
+                </a>
                 {% endfor %}
             </div>
             {% endif %}
@@ -85,7 +85,7 @@
             <!-- Samples Grid -->
             <div class="sample-gallery" id="sampleGallery">
                 {% for sample in samples %}
-                <div class="sample-item service-{{ sample.service_type.id }}" 
+                <div class="sample-item" 
                      data-bs-toggle="modal" 
                      data-bs-target="#sampleModal{{ sample.id }}">
                     <img src="{{ sample.image.url }}" alt="{{ sample.title }}">
@@ -117,7 +117,13 @@
                 <div class="col-12">
                     <div class="text-center py-5">
                         <i class="bi bi-images display-1 text-muted"></i>
-                        <p class="text-muted mt-3">Chưa có sample nào.</p>
+                        <p class="text-muted mt-3">
+                            {% if selected_service %}
+                            Không có sample nào cho loại dịch vụ này.
+                            {% else %}
+                            Chưa có sample nào.
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
                 {% endfor %}
@@ -129,10 +135,10 @@
                 <ul class="pagination justify-content-center">
                     {% if samples.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page=1">«« Đầu</a>
+                        <a class="page-link" href="?{% if selected_service %}service={{ selected_service }}&{% endif %}page=1">«« Đầu</a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ samples.previous_page_number }}">« Trước</a>
+                        <a class="page-link" href="?{% if selected_service %}service={{ selected_service }}&{% endif %}page={{ samples.previous_page_number }}">« Trước</a>
                     </li>
                     {% endif %}
 
@@ -143,17 +149,17 @@
                         </li>
                         {% elif num > samples.number|add:'-3' and num < samples.number|add:'3' %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            <a class="page-link" href="?{% if selected_service %}service={{ selected_service }}&{% endif %}page={{ num }}">{{ num }}</a>
                         </li>
                         {% endif %}
                     {% endfor %}
 
                     {% if samples.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ samples.next_page_number }}">Sau »</a>
+                        <a class="page-link" href="?{% if selected_service %}service={{ selected_service }}&{% endif %}page={{ samples.next_page_number }}">Sau »</a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ samples.paginator.num_pages }}">Cuối »»</a>
+                        <a class="page-link" href="?{% if selected_service %}service={{ selected_service }}&{% endif %}page={{ samples.paginator.num_pages }}">Cuối »»</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -179,52 +185,4 @@
     </div>
     {% endif %}
 </div>
-
-<script>
-// Filter function
-document.addEventListener('DOMContentLoaded', function() {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const sampleItems = document.querySelectorAll('.sample-item');
-    
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const filter = this.getAttribute('data-filter');
-            
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            
-            let visibleCount = 0;
-            
-            sampleItems.forEach(item => {
-                if (filter === 'all') {
-                    item.style.display = 'block';
-                    visibleCount++;
-                } else if (item.classList.contains(filter)) {
-                    item.style.display = 'block';
-                    visibleCount++;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-            
-            const gallery = document.getElementById('sampleGallery');
-            let noResultMsg = gallery.querySelector('.no-results');
-            
-            if (visibleCount === 0) {
-                if (!noResultMsg) {
-                    noResultMsg = document.createElement('div');
-                    noResultMsg.className = 'no-results col-12 text-center py-5';
-                    noResultMsg.innerHTML = '<i class="bi bi-search display-1 text-muted"></i><p class="text-muted mt-3">Không có sample nào cho loại dịch vụ này.</p>';
-                    gallery.appendChild(noResultMsg);
-                }
-                noResultMsg.style.display = 'block';
-            } else {
-                if (noResultMsg) {
-                    noResultMsg.style.display = 'none';
-                }
-            }
-        });
-    });
-});
-</script>
 {% endblock %}

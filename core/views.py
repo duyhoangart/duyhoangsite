@@ -17,11 +17,27 @@ def is_customer(user):
 
 # ============= PUBLIC VIEWS =============
 def home(request):
-    """Trang chủ - hiển thị samples và giá"""
+    """Trang chủ - hiển thị samples và giá với filter"""
     services = ServiceType.objects.filter(is_active=True)
     
-    # Lấy tất cả samples và sắp xếp theo display_order
-    samples_list = Sample.objects.select_related('service_type').order_by('display_order', '-id')
+    # Lấy service filter từ URL parameter
+    selected_service = request.GET.get('service')
+    
+    # Lọc samples theo service nếu có
+    if selected_service:
+        try:
+            selected_service = int(selected_service)
+            samples_list = Sample.objects.filter(
+                service_type_id=selected_service
+            ).select_related('service_type').order_by('display_order', '-id')
+        except (ValueError, TypeError):
+            # Nếu service ID không hợp lệ, hiện tất cả
+            samples_list = Sample.objects.select_related('service_type').order_by('display_order', '-id')
+            selected_service = None
+    else:
+        # Hiện tất cả samples
+        samples_list = Sample.objects.select_related('service_type').order_by('display_order', '-id')
+        selected_service = None
     
     # Pagination: 12 samples per page
     paginator = Paginator(samples_list, 12)
@@ -30,18 +46,17 @@ def home(request):
     try:
         samples = paginator.page(page)
     except PageNotAnInteger:
-        # If page is not an integer, deliver first page
         samples = paginator.page(1)
     except EmptyPage:
-        # If page is out of range, deliver last page
         samples = paginator.page(paginator.num_pages)
     
     tos = TermsOfService.objects.filter(is_active=True).first()
     
     context = {
         'services': services,
-        'samples': samples,  # Đây giờ là paginated object
+        'samples': samples,
         'tos': tos,
+        'selected_service': selected_service,  # ← THÊM DÒNG NÀY
     }
     return render(request, 'home.html', context)
 
