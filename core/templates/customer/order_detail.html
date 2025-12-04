@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load custom_filters %}
 {% block title %}Chi tiết đơn hàng {{ order.order_id }}{% endblock %}
 
 {% block content %}
@@ -41,7 +41,7 @@
                     <div class="row mb-3">
                         <div class="col-sm-4"><strong>Giá:</strong></div>
                         <div class="col-sm-8">
-                            <strong class="text-primary">{{ order.price|floatformat:0 }}đ</strong>
+                            <strong class="text-primary">{{ order.price|vnd_currency }}</strong>
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -106,7 +106,7 @@
                                 
                                 <div class="info-item">
                                     <div class="info-label">Số tiền</div>
-                                    <div class="info-value">{{ order.price|floatformat:0 }}đ</div>
+                                    <div class="info-value">{{ order.price|vnd_currency }}</div>
                                 </div>
                                 
                                 <div class="info-item">

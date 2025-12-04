@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load custom_filters %}
 {% block title %}Quản lý đơn hàng{% endblock %}
 
 {% block content %}
@@ -61,7 +61,7 @@
                                     <td><strong>{{ order.order_id }}</strong></td>
                                     <td>{{ order.customer.username }}</td>
                                     <td>{{ order.service_type.name }}</td>
-                                    <td>{{ order.price|floatformat:0 }}đ</td>
+                                    <td>{{ order.price|vnd_currency }}</td>
                                     <td>
                                         <span class="status-badge status-{{ order.status }}">
                                             {{ order.get_status_display }}

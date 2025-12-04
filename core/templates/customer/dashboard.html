@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title %}Dashboard - Khách hàng{% endblock %}
 
@@ -81,7 +82,7 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ order.service_type.name }}</td>
-                                    <td>{{ order.price|floatformat:0 }}đ</td>
+                                    <td>{{ order.price|vnd_currency }}</td>
                                     <td>
                                         <span class="status-badge status-{{ order.status }}">
                                             {{ order.get_status_display }}

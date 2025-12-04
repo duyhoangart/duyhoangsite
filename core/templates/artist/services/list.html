@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load custom_filters %}
 {% block title %}Quản lý dịch vụ{% endblock %}
 
 {% block content %}
@@ -24,7 +24,7 @@
                         <div>
                             <h4>{{ service.name }}</h4>
                             <p class="text-muted">{{ service.description }}</p>
-                            <h5 class="text-primary">{{ service.price|floatformat:0 }}đ</h5>
+                            <h5 class="text-primary">{{ service.price|vnd_currency }}</h5>
                             <span class="badge {% if service.is_active %}bg-success{% else %}bg-secondary{% endif %}">
                                 {% if service.is_active %}Đang hoạt động{% else %}Tạm dừng{% endif %}
                             </span>

@@ -1,57 +1,301 @@
 {% extends 'base.html' %}
 
-{% block title %}Đăng ký - Duy Hoàng Art{% endblock %}
+{% block title %}Đăng ký{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm mt-5">
                 <div class="card-body p-5">
-                    <h2 class="text-center mb-4">
-                        <i class="bi bi-person-plus"></i> Đăng ký tài khoản
-                    </h2>
+                    <h2 class="text-center mb-4">Đăng ký tài khoản</h2>
                     
-                    <form method="post">
+                    <form method="post" id="registerForm">
                         {% csrf_token %}
                         
-                        {% for field in form %}
+                        <!-- Username -->
                         <div class="mb-3">
-                            <label for="{{ field.id_for_label }}" class="form-label">
-                                {{ field.label }}
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                Tên đăng nhập *
                             </label>
-                            {{ field }}
-                            
-                            {% if field.help_text %}
-                            <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
-                            
-                            {% if field.errors %}
-                            <div class="text-danger small">
-                                {% for error in field.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
+                            {{ form.username }}
+                            <small class="form-text text-muted d-block">
+                                {{ form.username.help_text }}
+                            </small>
+                            <div id="usernameError" class="small mt-1"></div>
+                            {% if form.username.errors %}
+                            <div class="text-danger small">{{ form.username.errors }}</div>
                             {% endif %}
                         </div>
-                        {% endfor %}
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                Email *
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="text-danger small">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="mb-3">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">
+                                Số điện thoại
+                            </label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                            <div class="text-danger small">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
                         
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-person-plus"></i> Đăng ký
-                            </button>
+                        <!-- Password 1 -->
+                        <div class="mb-3">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                Mật khẩu *
+                            </label>
+                            <div class="input-group">
+                                {{ form.password1 }}
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword1">
+                                    <i class="bi bi-eye" id="eyeIcon1"></i>
+                                </button>
+                            </div>
+                            <div class="password-requirements mt-2">
+                                <small class="text-muted d-block mb-1">Yêu cầu mật khẩu:</small>
+                                <div class="requirement" id="req-length">
+                                    <i class="bi bi-circle"></i> Ít nhất 8 ký tự
+                                </div>
+                                <div class="requirement" id="req-letter">
+                                    <i class="bi bi-circle"></i> Có chữ cái
+                                </div>
+                                <div class="requirement" id="req-number">
+                                    <i class="bi bi-circle"></i> Có số
+                                </div>
+                            </div>
+                            {% if form.password1.errors %}
+                            <div class="text-danger small">{{ form.password1.errors }}</div>
+                            {% endif %}
                         </div>
+                        
+                        <!-- Password 2 -->
+                        <div class="mb-4">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                Xác nhận mật khẩu *
+                            </label>
+                            <div class="input-group">
+                                {{ form.password2 }}
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword2">
+                                    <i class="bi bi-eye" id="eyeIcon2"></i>
+                                </button>
+                            </div>
+                            <div id="matchError" class="small mt-1"></div>
+                            {% if form.password2.errors %}
+                            <div class="text-danger small">{{ form.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-primary w-100 mb-3" id="submitBtn" disabled>
+                            Đăng ký
+                        </button>
+                        
+                        <p class="text-center mb-0">
+                            Đã có tài khoản? <a href="{% url 'login' %}">Đăng nhập</a>
+                        </p>
                     </form>
-                    
-                    <hr class="my-4">
-                    
-                    <p class="text-center text-muted">
-                        Đã có tài khoản? 
-                        <a href="{% url 'login' %}">Đăng nhập</a>
-                    </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.requirement {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.requirement.valid {
+    color: #198754;
+}
+
+.requirement.valid i::before {
+    content: "\f26b"; /* bi-check-circle-fill */
+}
+
+.input-group .btn-outline-secondary {
+    border-left: 0;
+}
+
+.input-group .form-control:focus + .btn-outline-secondary {
+    border-color: #86b7fe;
+}
+
+#usernameError.text-success {
+    color: #198754 !important;
+}
+
+#usernameError.text-danger {
+    color: #dc3545 !important;
+}
+
+#matchError.text-danger {
+    color: #dc3545 !important;
+}
+
+#matchError.text-success {
+    color: #198754 !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const usernameInput = document.getElementById('id_username');
+    const emailInput = document.getElementById('id_email');
+    const password1Input = document.getElementById('id_password1');
+    const password2Input = document.getElementById('id_password2');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Toggle password visibility
+    function setupPasswordToggle(inputId, buttonId, iconId) {
+        const input = document.getElementById(inputId);
+        const button = document.getElementById(buttonId);
+        const icon = document.getElementById(iconId);
+        
+        button.addEventListener('click', function() {
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            
+            if (type === 'text') {
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        });
+    }
+    
+    setupPasswordToggle('id_password1', 'togglePassword1', 'eyeIcon1');
+    setupPasswordToggle('id_password2', 'togglePassword2', 'eyeIcon2');
+    
+    // Password strength checker REALTIME
+    password1Input.addEventListener('input', function() {
+        const password = this.value;
+        
+        // Check length
+        const reqLength = document.getElementById('req-length');
+        if (password.length >= 8) {
+            reqLength.classList.add('valid');
+        } else {
+            reqLength.classList.remove('valid');
+        }
+        
+        // Check letter
+        const reqLetter = document.getElementById('req-letter');
+        if (/[a-zA-Z]/.test(password)) {
+            reqLetter.classList.add('valid');
+        } else {
+            reqLetter.classList.remove('valid');
+        }
+        
+        // Check number
+        const reqNumber = document.getElementById('req-number');
+        if (/[0-9]/.test(password)) {
+            reqNumber.classList.add('valid');
+        } else {
+            reqNumber.classList.remove('valid');
+        }
+        
+        checkFormValid();
+        checkPasswordMatch();
+    });
+    
+    // Check password match REALTIME
+    password2Input.addEventListener('input', checkPasswordMatch);
+    
+    function checkPasswordMatch() {
+        const matchError = document.getElementById('matchError');
+        if (password2Input.value.length === 0) {
+            matchError.textContent = '';
+            matchError.className = 'small mt-1';
+        } else if (password1Input.value !== password2Input.value) {
+            matchError.textContent = '✗ Mật khẩu không khớp';
+            matchError.className = 'small mt-1 text-danger';
+        } else {
+            matchError.textContent = '✓ Mật khẩu khớp';
+            matchError.className = 'small mt-1 text-success';
+        }
+        checkFormValid();
+    }
+    
+    // Check username availability REALTIME
+    let usernameTimeout;
+    usernameInput.addEventListener('input', function() {
+        clearTimeout(usernameTimeout);
+        const username = this.value;
+        
+        if (username.length < 3) {
+            document.getElementById('usernameError').textContent = '';
+            document.getElementById('usernameError').className = 'small mt-1';
+            checkFormValid();
+            return;
+        }
+        
+        usernameTimeout = setTimeout(() => {
+            fetch(`/check-username/?username=${encodeURIComponent(username)}`)
+                .then(res => res.json())
+                .then(data => {
+                    const errorDiv = document.getElementById('usernameError');
+                    if (data.exists) {
+                        errorDiv.textContent = '✗ Tên đăng nhập đã tồn tại';
+                        errorDiv.className = 'small mt-1 text-danger';
+                    } else {
+                        errorDiv.textContent = '✓ Tên đăng nhập khả dụng';
+                        errorDiv.className = 'small mt-1 text-success';
+                    }
+                    checkFormValid();
+                })
+                .catch(() => {
+                    checkFormValid();
+                });
+        }, 500);
+    });
+    
+    // Enable/disable submit button
+    function checkFormValid() {
+        const usernameValid = usernameInput.value.length >= 3 && 
+                             !document.getElementById('usernameError').textContent.includes('tồn tại');
+        const emailValid = emailInput.value.includes('@') && emailInput.value.includes('.');
+        const password1Valid = password1Input.value.length >= 8 && 
+                              /[a-zA-Z]/.test(password1Input.value) && 
+                              /[0-9]/.test(password1Input.value);
+        const password2Valid = password2Input.value === password1Input.value && password2Input.value.length > 0;
+        
+        if (usernameValid && emailValid && password1Valid && password2Valid) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('btn-secondary');
+            submitBtn.classList.add('btn-primary');
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('btn-primary');
+            submitBtn.classList.add('btn-secondary');
+        }
+    }
+    
+    // Check on email input
+    emailInput.addEventListener('input', checkFormValid);
+    
+    // Initial check
+    checkFormValid();
+});
+</script>
 {% endblock %}

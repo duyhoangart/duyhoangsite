@@ -22,7 +22,8 @@
                         {% for service in services %}
                         <div class="mb-2">
                             <strong>{{ service.name }}:</strong> 
-                            <span class="text-primary">{{ service.price|floatformat:0 }}đ</span>
+                            <span class="text-primary">{% load custom_filters %}
+{{ service.price|vnd_currency }}</span>
                             <br>
                             <small class="text-muted">{{ service.description }}</small>
                         </div>

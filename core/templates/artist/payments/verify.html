@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load custom_filters %}
 {% block title %}Xác thực thanh toán{% endblock %}
 
 {% block content %}
@@ -17,7 +17,7 @@
                             <p><strong>Mã đơn:</strong> {{ payment.order.order_id }}</p>
                             <p><strong>Mã chuyển khoản:</strong> <span class="badge bg-primary">{{ payment.order.get_short_order_id }}</span></p>
                             <p><strong>Khách hàng:</strong> {{ payment.order.customer.username }}</p>
-                            <p><strong>Giá đơn hàng:</strong> {{ payment.order.price|floatformat:0 }}đ</p>
+                            <p><strong>Giá đơn hàng:</strong> {{ payment.order.price|vnd_currency }}</p>
                             <p><strong>Số tiền đã chuyển:</strong> <strong class="text-success">{{ payment.amount|floatformat:0 }}đ</strong></p>
                             {% if payment.transaction_id %}
                             <p><strong>Mã giao dịch:</strong> {{ payment.transaction_id }}</p>

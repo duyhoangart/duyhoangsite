@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load custom_filters %}
 {% block title %}Upload chứng từ thanh toán - {{ order.order_id }}{% endblock %}
 
 {% block content %}
@@ -41,7 +41,7 @@
                         
                         <div class="info-item">
                             <div class="info-label">Số tiền cần chuyển</div>
-                            <div class="info-value">{{ order.price|floatformat:0 }}đ</div>
+                            <div class="info-value">{{ order.price|vnd_currency }}</div>
                         </div>
                         
                         <div class="info-item" style="background: rgba(255, 255, 255, 0.2);">

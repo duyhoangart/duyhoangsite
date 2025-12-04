@@ -611,3 +611,11 @@ def artist_messages(request):
         'orders': orders_with_messages,
     }
     return render(request, 'artist/messages.html', context)
+# THÊM VÀO CUỐI FILE views.py
+from django.http import JsonResponse
+
+def check_username(request):
+    """API endpoint to check if username exists"""
+    username = request.GET.get('username', '')
+    exists = User.objects.filter(username=username).exists()
+    return JsonResponse({'exists': exists})

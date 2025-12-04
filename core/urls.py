@@ -34,4 +34,6 @@ urlpatterns = [
     path('artist/payments/', views.artist_payments, name='artist_payments'),
     path('artist/payment/<int:payment_id>/verify/', views.verify_payment, name='verify_payment'),
     path('artist/customers/', views.manage_customers, name='manage_customers'),
+
+     path('check-username/', views.check_username, name='check_username'),
 ]

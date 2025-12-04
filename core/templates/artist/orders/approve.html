@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Duyệt đơn hàng{% endblock %}
-
+{% load custom_filters %}
 {% block content %}
 <div class="container">
     <div class="row justify-content-center">
@@ -13,7 +13,7 @@
                     <div class="alert alert-info">
                         <strong>Khách hàng:</strong> {{ order.customer.username }}<br>
                         <strong>Dịch vụ:</strong> {{ order.service_type.name }}<br>
-                        <strong>Giá gốc:</strong> {{ order.service_type.price|floatformat:0 }}đ
+                        <strong>Giá gốc:</strong> {{ order.service_type.price|vnd_currency }}
                     </div>
                     
                     <form method="post">
